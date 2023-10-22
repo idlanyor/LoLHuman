@@ -77,9 +77,3 @@ $('.popover-dismiss').popover({
   trigger: 'focus'
 });
 
-
-// Version in Sidebar
-
-var version = document.getElementById('version-ruangadmin');
-
-version.innerHTML = "Version 1.1";
