@@ -1,0 +1,577 @@
+openapi: 3.0.0
+info:
+  title: Kanata Scraper API
+  description: API documentation for Kanata Scraper (Otakudesu, etc.)
+  version: 1.0.0
+servers:
+  - url: http://localhost:3000
+    description: Local Development Server
+
+paths:
+  /api/serverinfo:
+    get:
+      tags:
+        - System
+      summary: Get Server Info
+      description: Returns system statistics (CPU, Memory, Uptime).
+      responses:
+        '200':
+          description: System info
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  platform:
+                    type: string
+                  uptime:
+                    type: string
+                  memory:
+                    type: object
+                  cpu:
+                    type: object
+
+  /api/scraper/tiktok:
+    get:
+      tags:
+        - Downloader
+      summary: TikTok Downloader
+      description: Downloads TikTok video without watermark.
+      parameters:
+        - in: query
+          name: url
+          schema:
+            type: string
+          required: true
+          description: TikTok video URL
+      responses:
+        '200':
+          description: Video data
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  title: { type: string }
+                  author: { type: string }
+                  cover: { type: string }
+                  nowm: { type: string }
+                  music: { type: string }
+                  stats: { type: object }
+
+  /api/neonime/home:
+    get:
+      tags:
+        - Neonime
+      summary: Get Neonime Homepage Data
+      description: Scrapes the latest ongoing and complete anime from Neonime.
+      responses:
+        '200':
+          description: Homepage data
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  ongoing: { type: array, items: { type: object } }
+                  complete: { type: array, items: { type: object } }
+
+  /api/neonime/search:
+    get:
+      tags:
+        - Neonime
+      summary: Search Anime on Neonime
+      parameters:
+        - in: query
+          name: q
+          required: true
+          schema: { type: string }
+      responses:
+        '200':
+          description: Search results
+          content:
+            application/json:
+              schema: { type: array, items: { type: object } }
+
+  /api/neonime/anime/{slug}:
+    get:
+      tags:
+        - Neonime
+      summary: Get Neonime Anime Details
+      parameters:
+        - in: path
+          name: slug
+          required: true
+          schema: { type: string }
+      responses:
+        '200':
+          description: Anime details
+          content:
+            application/json:
+              schema: { type: object }
+
+  /api/scraper/sholat/cities:
+    get:
+      tags:
+        - Islamic
+      summary: Get Sholat Cities
+      description: Returns a list of all supported cities for prayer schedules.
+      responses:
+        '200':
+          description: List of cities
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    id: { type: string }
+                    lokasi: { type: string }
+
+  /api/scraper/sholat/{cityId}:
+    get:
+      tags:
+        - Islamic
+      summary: Get Prayer Schedule
+      description: Returns daily prayer schedule for a specific city ID.
+      parameters:
+        - in: path
+          name: cityId
+          schema:
+            type: string
+          required: true
+          description: City ID from the /cities endpoint
+      responses:
+        '200':
+          description: Prayer schedule
+          content:
+            application/json:
+              schema:
+                type: object
+
+  /api/scraper/test:
+    get:
+      tags:
+        - General Scraper
+      summary: Test Scraper
+      description: Scrapes example.com to verify scraping capabilities.
+      responses:
+        "200":
+          description: Successful scraping
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  title:
+                    type: string
+                    example: Example Domain
+                  message:
+                    type: string
+                    example: Scraping successful
+
+  /api/otakudesu/home:
+    get:
+      tags:
+        - Otakudesu
+      summary: Get Otakudesu Homepage Data
+      description: Scrapes the latest ongoing and complete anime from the Otakudesu homepage.
+      responses:
+        '200':
+          description: Homepage data
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  ongoing:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        title: { type: string }
+                        episode: { type: string }
+                        day: { type: string }
+                        date: { type: string }
+                        thumb: { type: string }
+                        slug: { type: string }
+                  complete:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        title: { type: string }
+                        episode: { type: string }
+                        score: { type: string }
+                        date: { type: string }
+                        thumb: { type: string }
+                        slug: { type: string }
+
+  /api/otakudesu/schedule:
+    get:
+      tags:
+        - Otakudesu
+      summary: Get Otakudesu Release Schedule
+      description: Scrapes the weekly release schedule from Otakudesu.
+      responses:
+        '200':
+          description: Release schedule data
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    day: { type: string }
+                    animeList:
+                      type: array
+                      items:
+                        type: object
+                        properties:
+                          title: { type: string }
+                          slug: { type: string }
+
+  /api/otakudesu/complete:
+    get:
+      tags:
+        - Otakudesu
+      summary: Get Otakudesu Complete Anime List
+      description: Scrapes the list of completed anime from Otakudesu with pagination.
+      parameters:
+        - in: query
+          name: page
+          schema:
+            type: string
+          description: Page number (default is 1)
+      responses:
+        '200':
+          description: Complete anime list
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    title: { type: string }
+                    episode: { type: string }
+                    score: { type: string }
+                    date: { type: string }
+                    thumb: { type: string }
+                    slug: { type: string }
+
+  /api/otakudesu/ongoing:
+    get:
+      tags:
+        - Otakudesu
+      summary: Get Otakudesu Ongoing Anime List
+      description: Scrapes the list of ongoing anime from Otakudesu with pagination.
+      parameters:
+        - in: query
+          name: page
+          schema:
+            type: string
+          description: Page number (default is 1)
+      responses:
+        '200':
+          description: Ongoing anime list
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    title: { type: string }
+                    episode: { type: string }
+                    day: { type: string }
+                    date: { type: string }
+                    thumb: { type: string }
+                    slug: { type: string }
+
+  /api/otakudesu/search:
+    get:
+      tags:
+        - Otakudesu
+      summary: Search Anime
+      description: Searches for anime on Otakudesu using a query string.
+      parameters:
+        - in: query
+          name: q
+          schema:
+            type: string
+          required: true
+          description: Search query (e.g., one piece)
+      responses:
+        '200':
+          description: Search results
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    title: { type: string }
+                    thumb: { type: string }
+                    genres: { type: array, items: { type: string } }
+                    status: { type: string }
+                    rating: { type: string }
+                    slug: { type: string }
+
+  /api/otakudesu/anime/{slug}:
+    get:
+      tags:
+        - Otakudesu
+      summary: Get Anime Details
+      description: Scrapes details of a specific anime and its episode list.
+      parameters:
+        - in: path
+          name: slug
+          schema:
+            type: string
+          required: true
+          description: Anime slug (e.g., 1piece-sub-indo)
+      responses:
+        '200':
+          description: Anime details and episode list
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  title: { type: string }
+                  japanese: { type: string }
+                  score: { type: string }
+                  producer: { type: string }
+                  type: { type: string }
+                  status: { type: string }
+                  total_episode: { type: string }
+                  duration: { type: string }
+                  release_date: { type: string }
+                  studio: { type: string }
+                  genres: { type: array, items: { type: string } }
+                  thumb: { type: string }
+                  synopsis: { type: string }
+                  batch_link:
+                    type: object
+                    nullable: true
+                    properties:
+                      title: { type: string }
+                      slug: { type: string }
+                  episode_list:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        title: { type: string }
+                        slug: { type: string }
+                        date: { type: string }
+
+  /api/otakudesu/batch/{slug}:
+    get:
+      tags:
+        - Otakudesu
+      summary: Get Batch Download Links
+      description: Scrapes batch download links for a specific anime batch.
+      parameters:
+        - in: path
+          name: slug
+          schema:
+            type: string
+          required: true
+          description: Batch slug (e.g., wpoiec-batch-sub-indo)
+      responses:
+        '200':
+          description: Batch details and download links
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  title: { type: string }
+                  thumb: { type: string }
+                  download_list:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        title: { type: string }
+                        links:
+                          type: array
+                          items:
+                            type: object
+                            properties:
+                              quality: { type: string }
+                              size: { type: string }
+                              links:
+                                type: array
+                                items:
+                                  type: object
+                                  properties:
+                                    name: { type: string }
+                                    url: { type: string }
+
+  /api/otakudesu/genres:
+    get:
+      tags:
+        - Otakudesu
+      summary: Get Otakudesu Genre List
+      description: Scrapes the list of available genres from Otakudesu.
+      responses:
+        '200':
+          description: Genre list
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    name: { type: string }
+                    slug: { type: string }
+
+  /api/otakudesu/genres/{slug}:
+    get:
+      tags:
+        - Otakudesu
+      summary: Get Anime by Genre
+      description: Scrapes the list of anime for a specific genre with pagination.
+      parameters:
+        - in: path
+          name: slug
+          schema:
+            type: string
+          required: true
+          description: Genre slug (e.g., action)
+        - in: query
+          name: page
+          schema:
+            type: string
+          description: Page number (default is 1)
+      responses:
+        '200':
+          description: Anime list by genre
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    title: { type: string }
+                    studio: { type: string }
+                    eps: { type: string }
+                    rating: { type: string }
+                    thumb: { type: string }
+                    slug: { type: string }
+                    date: { type: string }
+                    genres: { type: array, items: { type: string } }
+
+  /api/otakudesu/anime-list:
+    get:
+      tags:
+        - Otakudesu
+      summary: Get All Anime List
+      description: Scrapes all anime titles from Otakudesu grouped by their starting letter.
+      responses:
+        '200':
+          description: Grouped anime list
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    letter: { type: string }
+                    list:
+                      type: array
+                      items:
+                        type: object
+                        properties:
+                          title: { type: string }
+                          slug: { type: string }
+
+  /api/otakudesu/episode/{slug}:
+    get:
+      tags:
+        - Otakudesu
+      summary: Get Episode Details
+      description: Scrapes an episode page to get the title, default stream, and mirror list.
+      parameters:
+        - in: path
+          name: slug
+          schema:
+            type: string
+          required: true
+          description: The episode slug (e.g., tamon-kun-episode-1-sub-indo)
+      responses:
+        "200":
+          description: Episode details
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  title:
+                    type: string
+                  defaultStream:
+                    type: string
+                    description: URL of the default iframe stream
+                  mirrors:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        name:
+                          type: string
+                          example: vidhide
+                        payload:
+                          type: object
+                          description: JSON payload needed for /stream endpoint
+        "500":
+          description: Scraping failed
+
+  /api/otakudesu/stream:
+    post:
+      tags:
+        - Otakudesu
+      summary: Resolve Stream URL
+      description: Resolves the actual iframe URL for a specific mirror using the payload from the episode details.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - payload
+              properties:
+                payload:
+                  type: object
+                  description: The payload object obtained from the /episode/{slug} endpoint
+                  example:
+                    id: 191485
+                    i: 0
+                    q: "360p"
+      responses:
+        "200":
+          description: Stream URL resolved
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  iframe:
+                    type: string
+                    description: The resolved iframe URL
+                  html:
+                    type: string
+                    description: The raw HTML containing the iframe (decoded)
+        "400":
+          description: Missing payload
+        "500":
+          description: Failed to fetch stream

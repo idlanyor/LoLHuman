@@ -1,1 +1,2 @@
-## Roynaldi X LolHuman
+## Kanata API
+API Scraper and Documentation.

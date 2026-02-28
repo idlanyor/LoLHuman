@@ -1,1 +1,29 @@
 @import "tailwindcss";
+
+@layer base {
+  html.dark {
+    color-scheme: dark;
+  }
+  
+  body {
+    @apply transition-colors duration-300;
+    @apply bg-slate-50 text-slate-900;
+  }
+
+  html.dark body {
+    @apply bg-slate-950 text-slate-200;
+  }
+}
+
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
+
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+.active-glow {
+  box-shadow: 0 0 20px rgba(37, 99, 235, 0.2);
+}
